@@ -1,0 +1,37 @@
+
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: postgres-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: budgetdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: budget-tracker-app
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/budgetdb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    ports:
+      - "8080:8080"
+    restart: always
+
+volumes:
+  db-data:
+
+environment:
+  SPRING_DATASOURCE_PASSWORD: SUSvruhy1!
+  JWT_SECRET: jwt.secret=G5F2Q2r7l5fN8nQ1uJ7kS3mV9yB6zT8pW2eR4tY6uI8oP0aS3dF1gH2jK5lM7qR9

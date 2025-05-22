@@ -1,0 +1,4 @@
+package com.example.budgettracker.dto;
+
+public class RegistrationDTO {
+}
