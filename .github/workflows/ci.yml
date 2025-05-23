@@ -46,8 +46,8 @@ jobs:
         env:
           SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/budgettrackerdb
           SPRING_DATASOURCE_USERNAME: postgres
-          SPRING_DATASOURCE_PASSWORD: postgres  # Matches the service’s POSTGRES_PASSWORD
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          SPRING_DATASOURCE_PASSWORD: postgres
+          SPRING_JWT_SECRET: ${{ secrets.JWT_SECRET }}  # Use SPRING_ prefix for direct mapping
         run: mvn test
 
       - name: Build jar
