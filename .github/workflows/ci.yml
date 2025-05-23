@@ -46,7 +46,7 @@ jobs:
         env:
           SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/budgettrackerdb
           SPRING_DATASOURCE_USERNAME: postgres
-          POSTGRES_PASSWORD: postgres
+          SPRING_DATASOURCE_PASSWORD: postgres  # Matches the service’s POSTGRES_PASSWORD
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
         run: mvn test
 

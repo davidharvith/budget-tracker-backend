@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 public class JwtUtil {
 
     @Value("${jwt.secret}")
-    private String jwtSecret; // Load from application.properties
+    private String jwtSecret; // Load from application-local.properties
 
     @Value("${jwt.expirationMs}")
     private long jwtExpirationMs;
