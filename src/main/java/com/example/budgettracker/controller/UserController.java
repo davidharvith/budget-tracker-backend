@@ -1,6 +1,5 @@
 package com.example.budgettracker.controller;
 
-import org.springframework.security.access.prepost.PreAuthorize;
 import com.example.budgettracker.dto.request.RegistrationRequest;
 import com.example.budgettracker.service.UserService;
 import jakarta.validation.Valid;
