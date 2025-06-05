@@ -29,10 +29,7 @@ Thumbs.db
 *.tmp
 
 # Environment variables and secrets
-application-local.properties
+
 application-test-local.properties
 .env
 
-# Docker
-docker-compose.override.yml
-docker-compose.yml

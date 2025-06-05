@@ -16,7 +16,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.List;
 
@@ -26,19 +25,24 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+/**
+ * Unit test for the BudgetController using Spring's WebMvcTest.
+ * Mocks out the service layer and verifies controller behavior independently.
+ */
 @WebMvcTest(BudgetController.class)
-@AutoConfigureMockMvc(addFilters = false) // Add this
-@Import(SecurityConfig.class)
-@ActiveProfiles("test")
+@AutoConfigureMockMvc(addFilters = false) // Disable security filters for isolated controller testing
+@Import(SecurityConfig.class) // Import security config in case it's referenced
+@ActiveProfiles("test") // Use test profile (in-memory DB, etc.)
 public class BudgetControllerTest {
 
     @Autowired
-    private MockMvc mockMvc;
+    private MockMvc mockMvc; // Used to simulate HTTP requests to controller
 
+    // Inject mocked dependencies
     @MockitoBean
     private BudgetService budgetService;
 
-    @MockitoBean // Add these security mocks
+    @MockitoBean
     private JwtUtil jwtUtil;
 
     @MockitoBean
@@ -47,23 +51,32 @@ public class BudgetControllerTest {
     @MockitoBean
     private CustomUserDetailsService customUserDetailsService;
 
+    /**
+     * Test the POST /api/budgets endpoint.
+     * Mocks the creation of a new budget and checks for correct JSON response.
+     */
     @Test
     @WithMockUser(username = "testuser", roles = {"USER"})
     void createBudget_success() throws Exception {
         Budget mockBudget = new Budget("Test Budget", 1000.0, null);
-        mockBudget.setId(1L); // Set ID explicitly
-        System.out.println("[TEST] Mock Budget ID: " + mockBudget.getId());
-        when(budgetService.createBudget(anyString(), eq("Test Budget"),
-                eq(1000.0))).thenReturn(mockBudget);
+        mockBudget.setId(1L); // Simulate persisted budget
 
+        // Mock service behavior
+        when(budgetService.createBudget(anyString(), eq("Test Budget"), eq(1000.0)))
+                .thenReturn(mockBudget);
+
+        // Perform POST request
         mockMvc.perform(post("/api/budgets")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"name\":\"Test Budget\", \"amount\":1000.0}"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(1));
-
     }
 
+    /**
+     * Test the GET /api/budgets endpoint.
+     * Mocks retrieving all budgets for the authenticated user.
+     */
     @Test
     @WithMockUser(username = "testuser", roles = {"USER"})
     void getBudgets_success() throws Exception {
@@ -75,12 +88,15 @@ public class BudgetControllerTest {
 
         mockMvc.perform(get("/api/budgets"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(1)) // Now checks root array
+                .andExpect(jsonPath("$[0].id").value(1))
                 .andExpect(jsonPath("$[0].name").value("Test Budget"))
                 .andExpect(jsonPath("$[0].amount").value(1000.0));
-
     }
 
+    /**
+     * Test the PUT /api/budgets/{id} endpoint.
+     * Mocks updating a budget and verifies updated values are returned.
+     */
     @Test
     @WithMockUser(username = "testuser", roles = {"USER"})
     void updateBudget_success() throws Exception {
@@ -104,6 +120,10 @@ public class BudgetControllerTest {
                 .andExpect(jsonPath("$.amount").value(2000.0));
     }
 
+    /**
+     * Test the DELETE /api/budgets/{id} endpoint.
+     * Mocks deleting a budget and ensures a 204 No Content is returned.
+     */
     @Test
     @WithMockUser(username = "testuser", roles = {"USER"})
     void deleteBudget_success() throws Exception {

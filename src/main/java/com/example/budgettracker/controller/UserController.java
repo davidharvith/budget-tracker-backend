@@ -2,15 +2,18 @@ package com.example.budgettracker.controller;
 
 import com.example.budgettracker.dto.request.RegistrationRequest;
 import com.example.budgettracker.service.UserService;
+
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.Parameter;
+
 import org.springframework.security.core.Authentication;
 
 import java.util.Map;
@@ -22,10 +25,15 @@ public class UserController {
 
     private final UserService userService;
 
+    // Constructor injection of the UserService
     public UserController(UserService userService) {
         this.userService = userService;
     }
 
+    /**
+     * Endpoint for user registration.
+     * Accepts a RegistrationRequest payload and creates a new user in the system.
+     */
     @PostMapping("/register")
     @Operation(
             summary = "Register a new user",
@@ -40,6 +48,10 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully!");
     }
 
+    /**
+     * Returns the currently authenticated user's username.
+     * This is useful for client-side apps to confirm the login status or personalize the UI.
+     */
     @Operation(
             summary = "Get current user info",
             description = "Returns the username of the currently authenticated user."
@@ -52,6 +64,7 @@ public class UserController {
     public ResponseEntity<?> getCurrentUser(
             @Parameter(hidden = true) Authentication authentication
     ) {
+        // Uses Spring Security's Authentication object to get the username
         return ResponseEntity.ok(Map.of("username", authentication.getName()));
     }
 }

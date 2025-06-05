@@ -19,6 +19,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * Handles endpoints for creating, retrieving, updating, and deleting budgets.
+ */
 @Tag(name = "Budgets", description = "Endpoints for managing user budgets")
 @RestController
 @RequestMapping("/api/budgets")
@@ -30,10 +33,7 @@ public class BudgetController {
         this.budgetService = budgetService;
     }
 
-    @Operation(
-            summary = "Create a new budget",
-            description = "Creates a new budget for the authenticated user."
-    )
+    @Operation(summary = "Create a new budget", description = "Creates a new budget for the authenticated user.")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Budget created successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid input data"),
@@ -49,10 +49,7 @@ public class BudgetController {
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    @Operation(
-            summary = "Get all budgets",
-            description = "Returns all budgets for the authenticated user."
-    )
+    @Operation(summary = "Get all budgets", description = "Returns all budgets for the authenticated user.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "List of budgets returned successfully"),
             @ApiResponse(responseCode = "401", description = "Unauthorized")
@@ -66,10 +63,7 @@ public class BudgetController {
         return ResponseEntity.ok(budgets);
     }
 
-    @Operation(
-            summary = "Update a budget",
-            description = "Updates the specified budget for the authenticated user."
-    )
+    @Operation(summary = "Update a budget", description = "Updates the specified budget for the authenticated user.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Budget updated successfully"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
@@ -86,10 +80,7 @@ public class BudgetController {
         return ResponseEntity.ok(updated);
     }
 
-    @Operation(
-            summary = "Delete a budget",
-            description = "Deletes the specified budget for the authenticated user."
-    )
+    @Operation(summary = "Delete a budget", description = "Deletes the specified budget for the authenticated user.")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Budget deleted successfully"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
@@ -105,7 +96,12 @@ public class BudgetController {
         return ResponseEntity.noContent().build();
     }
 
-    // DTO for request validation
+    /**
+     * DTO for creating or updating a budget.
+     *
+     * @param name   The name of the budget.
+     * @param amount The initial or updated budget amount.
+     */
     @Schema(description = "Request body for creating or updating a budget")
     public record BudgetRequest(
             @Schema(description = "Name of the budget", example = "Vacation Fund")

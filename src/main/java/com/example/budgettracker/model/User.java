@@ -7,26 +7,49 @@ import jakarta.validation.constraints.NotBlank;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Represents a registered user of the Budget Tracker application.
+ * Each user has a unique username and email, a password, and one or more roles.
+ */
 @Entity
-@Table(name = "users")
+@Table(
+    name = "users",
+    indexes = {
+        @Index(name = "idx_username", columnList = "username"),
+        @Index(name = "idx_email", columnList = "email")
+    }
+)
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * Unique username for login and display purposes.
+     */
     @NotBlank(message = "Username is required")
     @Column(unique = true)
     private String username;
 
+    /**
+     * Unique email used for account identification and communication.
+     */
     @NotBlank(message = "Email is required")
     @Email(message = "Invalid email")
     @Column(unique = true)
     private String email;
 
+    /**
+     * Encrypted password stored securely (bcrypt).
+     */
     @NotBlank(message = "Password is required")
     private String password;
 
+    /**
+     * Roles assigned to the user. For example: USER, ADMIN.
+     * Stored as a simple set of strings.
+     */
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<String> roles = new HashSet<>();
 
@@ -40,7 +63,7 @@ public class User {
         this.roles = (roles != null) ? roles : new HashSet<>();
     }
 
-    // Getters and setters
+    // Getters and Setters
 
     public Long getId() {
         return id;

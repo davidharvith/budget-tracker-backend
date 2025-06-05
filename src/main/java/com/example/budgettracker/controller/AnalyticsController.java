@@ -16,6 +16,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * Controller for analytics endpoints related to transactions in a budget.
+ */
 @Tag(name = "Analytics", description = "Endpoints for analytics by category and by month for a budget")
 @RestController
 @RequestMapping("/api/budgets/{budgetId}/analytics")
@@ -27,6 +30,14 @@ public class AnalyticsController {
         this.analyticsService = analyticsService;
     }
 
+    /**
+     * Get total transaction amounts grouped by category.
+     *
+     * @param budgetId   ID of the budget
+     * @param type       Transaction type (INCOME or EXPENSE)
+     * @param userDetails Authenticated user details
+     * @return List of CategorySummary objects
+     */
     @Operation(
             summary = "Get analytics by category",
             description = "Returns total amounts grouped by category for the specified budget and transaction type."
@@ -47,6 +58,14 @@ public class AnalyticsController {
         return ResponseEntity.ok(summaries);
     }
 
+    /**
+     * Get total transaction amounts grouped by year and month.
+     *
+     * @param budgetId    ID of the budget
+     * @param type        Transaction type (INCOME or EXPENSE)
+     * @param userDetails Authenticated user details
+     * @return List of MonthlySummary objects
+     */
     @Operation(
             summary = "Get analytics by month",
             description = "Returns total amounts grouped by year and month for the specified budget and transaction type."

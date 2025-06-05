@@ -10,6 +10,10 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Service for providing analytical summaries over transactions.
+ * Includes methods for aggregating transaction amounts by category and by month.
+ */
 @Service
 public class AnalyticsService {
 
@@ -21,9 +25,15 @@ public class AnalyticsService {
         this.budgetRepository = budgetRepository;
     }
 
-    // Analytics by Category
+    /**
+     * Returns the total amount of transactions grouped by category for a given budget and transaction type.
+     *
+     * @param budgetId the ID of the budget
+     * @param type     the type of transactions (INCOME or EXPENSE)
+     * @param username the username of the budget owner
+     * @return a list of CategorySummary DTOs representing category totals
+     */
     public List<CategorySummary> sumByCategory(Long budgetId, Transaction.Type type, String username) {
-        // Optional: Check budget ownership
         budgetRepository.findById(budgetId)
                 .filter(b -> b.getOwner().getUsername().equals(username))
                 .orElseThrow(() -> new IllegalArgumentException("Budget not found or access denied"));
@@ -34,14 +44,20 @@ public class AnalyticsService {
                 .collect(Collectors.toList());
     }
 
-    // Analytics by Month
+    /**
+     * Returns the total amount of transactions grouped by year and month for a given budget and transaction type.
+     *
+     * @param budgetId the ID of the budget
+     * @param type     the type of transactions (INCOME or EXPENSE)
+     * @param username the username of the budget owner
+     * @return a list of MonthlySummary DTOs representing monthly totals
+     */
     public List<MonthlySummary> sumByMonth(Long budgetId, Transaction.Type type, String username) {
         budgetRepository.findById(budgetId)
                 .filter(b -> b.getOwner().getUsername().equals(username))
                 .orElseThrow(() -> new IllegalArgumentException("Budget not found or access denied"));
 
         List<Object[]> results = transactionRepository.sumByMonth(budgetId, type);
-        // In sumByMonth method
         return results.stream()
                 .map(obj -> new MonthlySummary(
                         (obj[0] != null) ? ((Number) obj[0]).intValue() : 0, // year
@@ -49,6 +65,5 @@ public class AnalyticsService {
                         (obj[2] != null) ? ((Number) obj[2]).doubleValue() : 0.0 // total
                 ))
                 .collect(Collectors.toList());
-
     }
 }

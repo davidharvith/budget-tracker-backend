@@ -16,14 +16,20 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(AdminController.class)
-@Import(com.example.budgettracker.config.SecurityConfig.class)
-@AutoConfigureMockMvc(addFilters = false) // Disable filters for this test
+/**
+ * Integration-style unit tests for AdminController using MockMvc.
+ *
+ * This test class verifies role-based access to admin-only endpoints.
+ */
+@WebMvcTest(AdminController.class) // Bootstraps only the AdminController (lightweight MVC test)
+@Import(com.example.budgettracker.config.SecurityConfig.class) // Imports the full security config
+@AutoConfigureMockMvc(addFilters = false) // Disables security filters like JWT for controlled testing
 public class AdminControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
+    // Mocking security-related beans to prevent actual authentication logic
     @MockitoBean
     private CustomUserDetailsService customUserDetailsService;
 
@@ -36,6 +42,9 @@ public class AdminControllerTest {
     @MockitoBean
     private PasswordEncoder passwordEncoder;
 
+    /**
+     * Test that an authenticated user with the ADMIN role can access the protected admin endpoint.
+     */
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void adminCanAccessAdminEndpoint() throws Exception {
@@ -44,6 +53,9 @@ public class AdminControllerTest {
                 .andExpect(content().string("You are an admin!"));
     }
 
+    /**
+     * Test that an authenticated user with the USER role is forbidden from accessing the admin-only endpoint.
+     */
     @Test
     @WithMockUser(username = "user", roles = {"USER"})
     void userCannotAccessAdminEndpoint() throws Exception {

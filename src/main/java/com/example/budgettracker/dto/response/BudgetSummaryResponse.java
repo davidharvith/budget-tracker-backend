@@ -2,6 +2,10 @@ package com.example.budgettracker.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+/**
+ * DTO used to return a high-level summary of a specific budget.
+ * This is returned from the GET /api/budgets/{budgetId}/summary endpoint.
+ */
 @Schema(description = "Summary of a budget, including total income, expenses, and balance.")
 public class BudgetSummaryResponse {
 
@@ -17,15 +21,37 @@ public class BudgetSummaryResponse {
     @Schema(description = "Remaining balance (income minus expenses)", example = "400.00")
     private double balance;
 
-    public BudgetSummaryResponse(Long budgetId, double totalIncome, double totalExpense) {
+    /**
+     * Constructor for BudgetSummaryResponse.
+     * Typically called by the service layer when preparing a response.
+     *
+     * @param budgetId the ID of the budget
+     * @param totalIncome sum of all income transactions
+     * @param totalExpense sum of all expense transactions
+     * @param balance totalIncome - totalExpense
+     */
+    public BudgetSummaryResponse(Long budgetId, double totalIncome, double totalExpense, double balance) {
         this.budgetId = budgetId;
         this.totalIncome = totalIncome;
         this.totalExpense = totalExpense;
-        this.balance = totalIncome - totalExpense;
+        this.balance = balance;
     }
 
-    public Long getBudgetId() { return budgetId; }
-    public double getTotalIncome() { return totalIncome; }
-    public double getTotalExpense() { return totalExpense; }
-    public double getBalance() { return balance; }
+    // === Getters (used by Spring to serialize to JSON) ===
+
+    public Long getBudgetId() {
+        return budgetId;
+    }
+
+    public double getTotalIncome() {
+        return totalIncome;
+    }
+
+    public double getTotalExpense() {
+        return totalExpense;
+    }
+
+    public double getBalance() {
+        return balance;
+    }
 }

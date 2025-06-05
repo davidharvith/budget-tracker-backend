@@ -13,9 +13,14 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Filter that processes incoming requests to validate JWT tokens.
+ * If the token is valid, it sets up the Spring Security context with the authenticated user.
+ */
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
@@ -27,15 +32,28 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         this.customUserDetailsService = customUserDetailsService;
     }
 
+    /**
+     * Filters each request to check for a valid JWT token.
+     * If the token is present and valid, it sets the authentication context.
+     *
+     * @param request     incoming HTTP request
+     * @param response    HTTP response
+     * @param filterChain chain of filters to continue the request
+     * @throws ServletException in case of servlet errors
+     * @throws IOException      in case of I/O errors
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain)
             throws ServletException, IOException {
+
+        // Allow preflight (CORS) requests to pass through
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             filterChain.doFilter(request, response);
             return;
-}
+        }
+
         final String authHeader = request.getHeader("Authorization");
         String username = null;
         String token = null;
@@ -50,16 +68,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     return;
                 }
 
-                // Load UserDetails from database
+                // Load user details from DB
                 UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
 
-                // Extract roles from token (or use roles from userDetails if preferred)
+                // Extract roles from token
                 List<String> roles = jwtUtil.getRolesFromToken(token);
                 List<SimpleGrantedAuthority> authorities = roles.stream()
                         .map(SimpleGrantedAuthority::new)
                         .toList();
 
-                // Create authentication token with UserDetails as principal
+                // Build and set authentication object
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
@@ -71,5 +89,18 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    /**
+     * Skips filtering for endpoints that don't require authentication.
+     * Used for public endpoints like registration and login.
+     *
+     * @param request incoming request
+     * @return true if the filter should be skipped
+     */
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        return path.equals("/api/register") || path.equals("/api/login");
     }
 }
